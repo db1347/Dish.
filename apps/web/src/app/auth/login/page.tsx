@@ -3,25 +3,31 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
-type Mode = 'password' | 'magic'
+type Screen = 'signin' | 'signup' | 'sent'
 
 export default function LoginPage() {
   const router = useRouter()
-  const [mode, setMode] = useState<Mode>('password')
+  const [screen, setScreen] = useState<Screen>('signin')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [username, setUsername] = useState('')
   const [loading, setLoading] = useState(false)
-  const [sent, setSent] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [existingEmail, setExistingEmail] = useState<string | null>(null)
   const supabase = createClient()
 
-  // Check if already logged in
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
       if (user?.email) setExistingEmail(user.email)
     })
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  function reset() {
+    setError(null)
+    setEmail('')
+    setPassword('')
+    setUsername('')
+  }
 
   async function handleSignOut() {
     setLoading(true)
@@ -30,7 +36,7 @@ export default function LoginPage() {
     setLoading(false)
   }
 
-  async function handlePassword(e: React.FormEvent) {
+  async function handleSignIn(e: React.FormEvent) {
     e.preventDefault()
     setLoading(true)
     setError(null)
@@ -44,16 +50,37 @@ export default function LoginPage() {
     }
   }
 
-  async function handleMagicLink(e: React.FormEvent) {
+  async function handleSignUp(e: React.FormEvent) {
     e.preventDefault()
     setLoading(true)
     setError(null)
-    const { error } = await supabase.auth.signInWithOtp({
+    if (username.length < 3) {
+      setError('Username must be at least 3 characters')
+      setLoading(false)
+      return
+    }
+    const { data, error } = await supabase.auth.signUp({
       email,
-      options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
+      password,
+      options: {
+        data: {
+          username: username.toLowerCase().replace(/\s+/g, '_'),
+          full_name: username,
+        },
+      },
     })
-    if (error) setError(error.message)
-    else setSent(true)
+    if (error) {
+      setError(error.message)
+      setLoading(false)
+      return
+    }
+    // If email confirmation is disabled in Supabase, session is returned immediately
+    if (data.session) {
+      router.push('/onboarding')
+      router.refresh()
+    } else {
+      setScreen('sent')
+    }
     setLoading(false)
   }
 
@@ -67,14 +94,12 @@ export default function LoginPage() {
     setLoading(false)
   }
 
-  // Already signed in — show signed-in state
+  // Already signed in
   if (existingEmail) {
     return (
       <main className="min-h-dvh bg-cream flex items-center justify-center px-5">
         <div className="w-full max-w-sm">
-          <div className="text-center mb-10">
-            <h1 className="font-serif font-bold text-5xl text-espresso mb-2">dish<span className="text-terracotta">.</span></h1>
-          </div>
+          <Logo />
           <div className="card p-6 text-center space-y-4">
             <div className="w-14 h-14 rounded-[18px] bg-terracotta/10 flex items-center justify-center mx-auto text-2xl">👋</div>
             <div>
@@ -94,80 +119,115 @@ export default function LoginPage() {
     )
   }
 
+  // Confirmation email sent
+  if (screen === 'sent') {
+    return (
+      <main className="min-h-dvh bg-cream flex items-center justify-center px-5">
+        <div className="w-full max-w-sm">
+          <Logo />
+          <div className="card p-6 text-center space-y-3">
+            <div className="text-4xl">📬</div>
+            <h2 className="font-semibold text-espresso">Check your inbox</h2>
+            <p className="text-sm text-clay">
+              Confirmation sent to <strong className="text-espresso">{email}</strong>.<br/>
+              Click the link to activate your account.
+            </p>
+            <p className="text-xs text-clay/70 pt-1">
+              No email? Check spam, or{' '}
+              <button onClick={() => { setScreen('signup'); reset() }} className="text-terracotta underline">try again</button>.
+            </p>
+          </div>
+        </div>
+      </main>
+    )
+  }
+
   return (
     <main className="min-h-dvh bg-cream flex items-center justify-center px-5">
       <div className="w-full max-w-sm">
-        <div className="text-center mb-10">
-          <h1 className="font-serif font-bold text-5xl text-espresso mb-2">dish<span className="text-terracotta">.</span></h1>
-          <p className="text-sm text-clay">Cook more. Share more.</p>
-        </div>
+        <Logo subtitle={screen === 'signup' ? 'Create your account' : 'Cook more. Share more.'} />
 
-        {sent ? (
-          <div className="card p-6 text-center">
-            <div className="text-4xl mb-3">📬</div>
-            <h2 className="font-semibold text-espresso mb-2">Check your inbox</h2>
-            <p className="text-sm text-clay">Magic link sent to <strong className="text-espresso">{email}</strong></p>
-            <button onClick={() => setSent(false)} className="mt-4 text-sm text-terracotta font-medium">Use a different email</button>
-          </div>
-        ) : (
-          <div className="space-y-3">
-            <button onClick={() => handleOAuth('google')} disabled={loading}
-              className="w-full flex items-center justify-center gap-3 bg-white border border-black/10 rounded-xl py-3.5 text-sm font-medium hover:bg-cream-linen transition-all disabled:opacity-60">
-              Continue with Google
-            </button>
-            <button onClick={() => handleOAuth('apple')} disabled={loading}
-              className="w-full flex items-center justify-center gap-3 bg-espresso border border-espresso rounded-xl py-3.5 text-sm font-medium text-white hover:bg-espresso/90 transition-all disabled:opacity-60">
-              Continue with Apple
-            </button>
+        <div className="space-y-3">
+          {/* OAuth */}
+          <button onClick={() => handleOAuth('google')} disabled={loading}
+            className="w-full flex items-center justify-center gap-3 bg-white border border-black/10 rounded-xl py-3.5 text-sm font-medium hover:bg-cream-linen transition-all disabled:opacity-60">
+            Continue with Google
+          </button>
+          <button onClick={() => handleOAuth('apple')} disabled={loading}
+            className="w-full flex items-center justify-center gap-3 bg-espresso rounded-xl py-3.5 text-sm font-medium text-white hover:bg-espresso/90 transition-all disabled:opacity-60">
+            Continue with Apple
+          </button>
 
-            <div className="flex items-center gap-3 py-1">
-              <div className="flex-1 h-px bg-black/10" />
-              <span className="text-xs text-clay">or</span>
-              <div className="flex-1 h-px bg-black/10" />
-            </div>
+          <Divider />
 
-            {/* Mode toggle */}
-            <div className="flex rounded-xl overflow-hidden border border-black/10 bg-cream-linen p-0.5 gap-0.5">
-              <button
-                onClick={() => { setMode('password'); setError(null) }}
-                className={`flex-1 py-2 text-xs font-semibold rounded-lg transition-all ${mode === 'password' ? 'bg-white text-espresso shadow-sm' : 'text-clay'}`}>
-                Password
-              </button>
-              <button
-                onClick={() => { setMode('magic'); setError(null) }}
-                className={`flex-1 py-2 text-xs font-semibold rounded-lg transition-all ${mode === 'magic' ? 'bg-white text-espresso shadow-sm' : 'text-clay'}`}>
-                Magic link
-              </button>
-            </div>
-
-            {mode === 'password' ? (
-              <form onSubmit={handlePassword} className="space-y-3">
+          {screen === 'signin' ? (
+            <>
+              <form onSubmit={handleSignIn} className="space-y-2.5">
                 <input type="email" value={email} onChange={e => setEmail(e.target.value)}
-                  placeholder="your@email.com" className="input-base" required />
+                  placeholder="Email" className="input-base" required />
                 <input type="password" value={password} onChange={e => setPassword(e.target.value)}
                   placeholder="Password" className="input-base" required />
-                {error && <p className="text-xs text-red-500">{error}</p>}
-                <button type="submit" disabled={loading || !email || !password} className="btn-primary w-full disabled:opacity-60">
+                {error && <p className="text-xs text-red-500 pt-0.5">{error}</p>}
+                <button type="submit" disabled={loading || !email || !password}
+                  className="btn-primary w-full disabled:opacity-60 mt-1">
                   {loading ? 'Signing in…' : 'Sign in'}
                 </button>
               </form>
-            ) : (
-              <form onSubmit={handleMagicLink} className="space-y-3">
+              <p className="text-center text-sm text-clay pt-1">
+                No account?{' '}
+                <button onClick={() => { setScreen('signup'); reset() }}
+                  className="text-terracotta font-semibold hover:underline">
+                  Create one
+                </button>
+              </p>
+            </>
+          ) : (
+            <>
+              <form onSubmit={handleSignUp} className="space-y-2.5">
+                <input type="text" value={username} onChange={e => setUsername(e.target.value)}
+                  placeholder="Username (e.g. marcorossi)" className="input-base" required minLength={3} />
                 <input type="email" value={email} onChange={e => setEmail(e.target.value)}
-                  placeholder="your@email.com" className="input-base" required />
-                {error && <p className="text-xs text-red-500">{error}</p>}
-                <button type="submit" disabled={loading || !email} className="btn-primary w-full disabled:opacity-60">
-                  {loading ? 'Sending…' : 'Send magic link'}
+                  placeholder="Email" className="input-base" required />
+                <input type="password" value={password} onChange={e => setPassword(e.target.value)}
+                  placeholder="Password (min 6 chars)" className="input-base" required minLength={6} />
+                {error && <p className="text-xs text-red-500 pt-0.5">{error}</p>}
+                <button type="submit" disabled={loading || !email || !password || !username}
+                  className="btn-primary w-full disabled:opacity-60 mt-1">
+                  {loading ? 'Creating account…' : 'Create account'}
                 </button>
               </form>
-            )}
-
-            <p className="text-center text-xs text-clay pt-1">
-              Test: <span className="font-medium text-espresso">marco@dish.test</span> · <span className="font-medium text-espresso">dish123</span>
-            </p>
-          </div>
-        )}
+              <p className="text-center text-sm text-clay pt-1">
+                Already have an account?{' '}
+                <button onClick={() => { setScreen('signin'); reset() }}
+                  className="text-terracotta font-semibold hover:underline">
+                  Sign in
+                </button>
+              </p>
+            </>
+          )}
+        </div>
       </div>
     </main>
+  )
+}
+
+function Logo({ subtitle }: { subtitle?: string }) {
+  return (
+    <div className="text-center mb-8">
+      <h1 className="font-serif font-bold text-5xl text-espresso mb-2">
+        dish<span className="text-terracotta">.</span>
+      </h1>
+      {subtitle && <p className="text-sm text-clay">{subtitle}</p>}
+    </div>
+  )
+}
+
+function Divider() {
+  return (
+    <div className="flex items-center gap-3 py-1">
+      <div className="flex-1 h-px bg-black/10" />
+      <span className="text-xs text-clay">or</span>
+      <div className="flex-1 h-px bg-black/10" />
+    </div>
   )
 }

@@ -5,6 +5,9 @@
 -- Safe to re-run (deletes & recreates seed rows each time)
 -- ================================================================
 
+-- Required for crypt() / gen_salt()
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
 -- ─── Wipe previous seed data ────────────────────────────────────
 DELETE FROM auth.users WHERE email LIKE '%@dish.test';
 -- CASCADE deletes public.users, recipes, follows, ratings, comments,
@@ -15,14 +18,17 @@ DELETE FROM auth.users WHERE email LIKE '%@dish.test';
 -- 1. AUTH USERS
 --    The trigger handle_new_user() fires on each INSERT and
 --    auto-creates the matching public.users row.
+--    instance_id '00000000-...' is the default for hosted Supabase.
 -- ================================================================
 INSERT INTO auth.users (
-  id, aud, role, email, encrypted_password, email_confirmed_at,
-  created_at, updated_at, raw_user_meta_data, raw_app_meta_data,
+  instance_id, id, aud, role, email, encrypted_password,
+  email_confirmed_at, created_at, updated_at,
+  raw_user_meta_data, raw_app_meta_data,
   is_super_admin, confirmation_token, email_change,
   email_change_token_new, recovery_token
 ) VALUES
   (
+    '00000000-0000-0000-0000-000000000000',
     'a0000001-0000-0000-0000-000000000001','authenticated','authenticated',
     'marco@dish.test', crypt('dish123', gen_salt('bf')), now(),
     now() - interval '45 days', now(),
@@ -31,6 +37,7 @@ INSERT INTO auth.users (
     false,'','','',''
   ),
   (
+    '00000000-0000-0000-0000-000000000000',
     'a0000001-0000-0000-0000-000000000002','authenticated','authenticated',
     'aisha@dish.test', crypt('dish123', gen_salt('bf')), now(),
     now() - interval '38 days', now(),
@@ -39,6 +46,7 @@ INSERT INTO auth.users (
     false,'','','',''
   ),
   (
+    '00000000-0000-0000-0000-000000000000',
     'a0000001-0000-0000-0000-000000000003','authenticated','authenticated',
     'sophie@dish.test', crypt('dish123', gen_salt('bf')), now(),
     now() - interval '30 days', now(),
@@ -47,6 +55,7 @@ INSERT INTO auth.users (
     false,'','','',''
   ),
   (
+    '00000000-0000-0000-0000-000000000000',
     'a0000001-0000-0000-0000-000000000004','authenticated','authenticated',
     'carlos@dish.test', crypt('dish123', gen_salt('bf')), now(),
     now() - interval '22 days', now(),
@@ -55,6 +64,7 @@ INSERT INTO auth.users (
     false,'','','',''
   ),
   (
+    '00000000-0000-0000-0000-000000000000',
     'a0000001-0000-0000-0000-000000000005','authenticated','authenticated',
     'yuki@dish.test', crypt('dish123', gen_salt('bf')), now(),
     now() - interval '14 days', now(),
@@ -63,6 +73,7 @@ INSERT INTO auth.users (
     false,'','','',''
   ),
   (
+    '00000000-0000-0000-0000-000000000000',
     'a0000001-0000-0000-0000-000000000006','authenticated','authenticated',
     'emma@dish.test', crypt('dish123', gen_salt('bf')), now(),
     now() - interval '7 days', now(),
