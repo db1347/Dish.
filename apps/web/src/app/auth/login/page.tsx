@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
@@ -13,7 +13,22 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false)
   const [sent, setSent] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [existingEmail, setExistingEmail] = useState<string | null>(null)
   const supabase = createClient()
+
+  // Check if already logged in
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (user?.email) setExistingEmail(user.email)
+    })
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  async function handleSignOut() {
+    setLoading(true)
+    await supabase.auth.signOut()
+    setExistingEmail(null)
+    setLoading(false)
+  }
 
   async function handlePassword(e: React.FormEvent) {
     e.preventDefault()
@@ -52,6 +67,33 @@ export default function LoginPage() {
     setLoading(false)
   }
 
+  // Already signed in — show signed-in state
+  if (existingEmail) {
+    return (
+      <main className="min-h-dvh bg-cream flex items-center justify-center px-5">
+        <div className="w-full max-w-sm">
+          <div className="text-center mb-10">
+            <h1 className="font-serif font-bold text-5xl text-espresso mb-2">dish<span className="text-terracotta">.</span></h1>
+          </div>
+          <div className="card p-6 text-center space-y-4">
+            <div className="w-14 h-14 rounded-[18px] bg-terracotta/10 flex items-center justify-center mx-auto text-2xl">👋</div>
+            <div>
+              <p className="text-sm text-clay">Signed in as</p>
+              <p className="font-semibold text-espresso mt-0.5">{existingEmail}</p>
+            </div>
+            <button onClick={() => { router.push('/'); router.refresh() }} className="btn-primary w-full">
+              Continue to dish.
+            </button>
+            <button onClick={handleSignOut} disabled={loading}
+              className="w-full text-sm text-clay hover:text-espresso transition-colors py-2 disabled:opacity-60">
+              {loading ? 'Signing out…' : 'Sign in with a different account'}
+            </button>
+          </div>
+        </div>
+      </main>
+    )
+  }
+
   return (
     <main className="min-h-dvh bg-cream flex items-center justify-center px-5">
       <div className="w-full max-w-sm">
@@ -85,15 +127,15 @@ export default function LoginPage() {
             </div>
 
             {/* Mode toggle */}
-            <div className="flex rounded-xl overflow-hidden border border-black/10 bg-cream-linen">
+            <div className="flex rounded-xl overflow-hidden border border-black/10 bg-cream-linen p-0.5 gap-0.5">
               <button
                 onClick={() => { setMode('password'); setError(null) }}
-                className={`flex-1 py-2 text-xs font-semibold transition-colors ${mode === 'password' ? 'bg-white text-espresso shadow-sm' : 'text-clay'}`}>
+                className={`flex-1 py-2 text-xs font-semibold rounded-lg transition-all ${mode === 'password' ? 'bg-white text-espresso shadow-sm' : 'text-clay'}`}>
                 Password
               </button>
               <button
                 onClick={() => { setMode('magic'); setError(null) }}
-                className={`flex-1 py-2 text-xs font-semibold transition-colors ${mode === 'magic' ? 'bg-white text-espresso shadow-sm' : 'text-clay'}`}>
+                className={`flex-1 py-2 text-xs font-semibold rounded-lg transition-all ${mode === 'magic' ? 'bg-white text-espresso shadow-sm' : 'text-clay'}`}>
                 Magic link
               </button>
             </div>
@@ -121,7 +163,7 @@ export default function LoginPage() {
             )}
 
             <p className="text-center text-xs text-clay pt-1">
-              Test accounts: <span className="text-espresso font-medium">marco@dish.test</span> · password <span className="text-espresso font-medium">dish123</span>
+              Test: <span className="font-medium text-espresso">marco@dish.test</span> · <span className="font-medium text-espresso">dish123</span>
             </p>
           </div>
         )}

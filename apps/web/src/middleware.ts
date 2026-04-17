@@ -23,7 +23,7 @@ export async function middleware(request: NextRequest) {
   const protectedRoutes = ['/generate', '/profile', '/saved']
   const isProtected = protectedRoutes.some(r => request.nextUrl.pathname.startsWith(r))
   if (isProtected && !user) return NextResponse.redirect(new URL('/auth/login', request.url))
-  if (user && request.nextUrl.pathname.startsWith('/auth')) return NextResponse.redirect(new URL('/', request.url))
+  // Don't redirect authenticated users away from /auth — the login page handles it
   return supabaseResponse
 }
 
