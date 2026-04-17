@@ -11,7 +11,7 @@ export default async function MyProfilePage() {
   if (!user) redirect('/auth/login')
 
   const { data: profile } = await supabase.from('users').select('*').eq('id', user.id).single()
-  if (!profile) redirect('/auth/login')
+  if (!profile) redirect('/onboarding')
 
   const { data: recipes } = await supabase
     .from('recipes')
