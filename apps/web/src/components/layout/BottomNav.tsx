@@ -1,7 +1,7 @@
 'use client'
 import Link from 'next/link'
 
-type NavItem = 'home' | 'explore' | 'generate' | 'saved' | 'profile'
+type NavItem = 'home' | 'explore' | 'generate' | 'saved' | 'profile' | 'meal-plan' | 'shopping'
 const C = { active: '#C4684A', muted: '#7A6A62' }
 
 export function BottomNav({ active }: { active: NavItem }) {
