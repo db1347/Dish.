@@ -32,7 +32,7 @@ export function MyProfileClient({
   )
 
   return (
-    <>
+    <div className="max-w-7xl mx-auto">
       {/* Hero */}
       <div className="bg-gradient-to-br from-terracotta/20 via-cream-linen to-sage/10 px-5 pt-8 pb-6">
         <div className="flex items-end gap-4 mb-4">
@@ -101,7 +101,7 @@ export function MyProfileClient({
       <div className="px-3 mt-3">
         {activeTab === 'recipes' && (
           recipes.length > 0 ? (
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
               {recipes.map(r => <RecipeCard key={r.id} recipe={r} />)}
             </div>
           ) : (
@@ -116,7 +116,7 @@ export function MyProfileClient({
 
         {activeTab === 'saved' && (
           savedRecipes.length > 0 ? (
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
               {savedRecipes.map(r => r && <RecipeCard key={r.id} recipe={r} />)}
             </div>
           ) : (
@@ -137,6 +137,6 @@ export function MyProfileClient({
           onSave={(updated) => setProfile(p => ({ ...p, ...updated }))}
         />
       )}
-    </>
+    </div>
   )
 }

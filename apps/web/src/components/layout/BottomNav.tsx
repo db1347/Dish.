@@ -31,8 +31,8 @@ export function BottomNav({ active }: { active: NavItem }) {
   ] as const
 
   return (
-    <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] z-40 bg-cream/95 backdrop-blur-sm border-t border-black/[0.08] pb-safe">
-      <div className="flex items-center justify-around px-2 pt-2 pb-2">
+    <nav className="fixed bottom-0 inset-x-0 z-40 bg-cream/95 backdrop-blur-sm border-t border-black/[0.08] pb-safe">
+      <div className="flex items-center justify-around px-2 pt-2 pb-2 max-w-7xl mx-auto">
         {(items.slice(0,2) as typeof items[number][]).map(item => (
           <Link key={item.key} href={item.href} className="flex flex-col items-center gap-1 flex-1 py-1">
             {item.icon(active === item.key)}

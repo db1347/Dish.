@@ -146,73 +146,75 @@ export function ExploreClient() {
       )}
 
       {/* Results */}
-      {loading ? (
-        <div className="px-3 pt-4">
-          <div className="grid grid-cols-2 gap-2">
-            {[...Array(6)].map((_, i) => <Skeleton key={i} className="h-48 rounded-2xl" />)}
+      <div className="max-w-7xl mx-auto">
+        {loading ? (
+          <div className="px-4 pt-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
+              {[...Array(8)].map((_, i) => <Skeleton key={i} className="h-48 rounded-2xl" />)}
+            </div>
           </div>
-        </div>
-      ) : (
-        <>
-          {/* Top chefs — shown when idle */}
-          {!isSearching && topChefs.length > 0 && (
-            <section className="px-4 pt-4 pb-2">
-              <h2 className="text-[13px] font-semibold text-espresso mb-3">Top chefs</h2>
-              <div className="space-y-3">
-                {topChefs.map(chef => (
-                  <div key={chef.id} className="flex items-center gap-3">
-                    <Link href={`/profile/${chef.username}`}
-                      className="w-10 h-10 rounded-full bg-cream-linen overflow-hidden flex items-center justify-center text-sm font-bold text-espresso flex-shrink-0">
-                      {chef.avatar_url
-                        ? <Image src={chef.avatar_url} alt={chef.display_name} width={40} height={40} className="w-full h-full object-cover" />
-                        : chef.display_name[0]?.toUpperCase()
-                      }
-                    </Link>
-                    <Link href={`/profile/${chef.username}`} className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-espresso truncate">{chef.display_name}</p>
-                      <p className="text-[10px] text-clay">@{chef.username} · {chef.follower_count} followers</p>
-                    </Link>
-                    <FollowButton targetUserId={chef.id} initialFollowing={false} currentUserId={null} />
-                  </div>
-                ))}
-              </div>
-            </section>
-          )}
-
-          <section className="px-3 pt-4">
-            {recipes.length > 0 ? (
-              <>
-                {isSearching && (
-                  <p className="text-xs text-clay mb-3 px-1">
-                    {recipes.length} result{recipes.length !== 1 ? 's' : ''} for &ldquo;{query}&rdquo;
-                  </p>
-                )}
-                {!isSearching && !hasFilters && (
-                  <h2 className="text-[13px] font-semibold text-espresso mb-3">Trending recipes</h2>
-                )}
-                <div className="grid grid-cols-2 gap-2">
-                  {recipes.map(r => <RecipeCard key={r.id} recipe={r} />)}
+        ) : (
+          <>
+            {/* Top chefs — shown when idle */}
+            {!isSearching && topChefs.length > 0 && (
+              <section className="px-4 pt-4 pb-2">
+                <h2 className="text-[13px] font-semibold text-espresso mb-3">Top chefs</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {topChefs.map(chef => (
+                    <div key={chef.id} className="flex items-center gap-3">
+                      <Link href={`/profile/${chef.username}`}
+                        className="w-10 h-10 rounded-full bg-cream-linen overflow-hidden flex items-center justify-center text-sm font-bold text-espresso flex-shrink-0">
+                        {chef.avatar_url
+                          ? <Image src={chef.avatar_url} alt={chef.display_name} width={40} height={40} className="w-full h-full object-cover" />
+                          : chef.display_name[0]?.toUpperCase()
+                        }
+                      </Link>
+                      <Link href={`/profile/${chef.username}`} className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold text-espresso truncate">{chef.display_name}</p>
+                        <p className="text-[10px] text-clay">@{chef.username} · {chef.follower_count} followers</p>
+                      </Link>
+                      <FollowButton targetUserId={chef.id} initialFollowing={false} currentUserId={null} />
+                    </div>
+                  ))}
                 </div>
-              </>
-            ) : (
-              <div className="flex flex-col items-center justify-center py-20 text-center px-8">
-                <div className="text-5xl mb-4">🔍</div>
-                <h3 className="heading-serif text-xl mb-2">No recipes found</h3>
-                <p className="text-sm text-clay mb-6">
-                  {isSearching ? `Nothing matched "${query}". Try different keywords.` : 'Try adjusting your filters.'}
-                </p>
-                {(isSearching || hasFilters) && (
-                  <button
-                    onClick={() => { setQuery(''); setCuisine(''); setDietary(''); setSkill(''); setMaxTime(0) }}
-                    className="btn-primary text-sm">
-                    Clear search
-                  </button>
-                )}
-              </div>
+              </section>
             )}
-          </section>
-        </>
-      )}
+
+            <section className="px-4 pt-4">
+              {recipes.length > 0 ? (
+                <>
+                  {isSearching && (
+                    <p className="text-xs text-clay mb-3">
+                      {recipes.length} result{recipes.length !== 1 ? 's' : ''} for &ldquo;{query}&rdquo;
+                    </p>
+                  )}
+                  {!isSearching && !hasFilters && (
+                    <h2 className="text-[13px] font-semibold text-espresso mb-3">Trending recipes</h2>
+                  )}
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
+                    {recipes.map(r => <RecipeCard key={r.id} recipe={r} />)}
+                  </div>
+                </>
+              ) : (
+                <div className="flex flex-col items-center justify-center py-20 text-center px-8">
+                  <div className="text-5xl mb-4">🔍</div>
+                  <h3 className="heading-serif text-xl mb-2">No recipes found</h3>
+                  <p className="text-sm text-clay mb-6">
+                    {isSearching ? `Nothing matched "${query}". Try different keywords.` : 'Try adjusting your filters.'}
+                  </p>
+                  {(isSearching || hasFilters) && (
+                    <button
+                      onClick={() => { setQuery(''); setCuisine(''); setDietary(''); setSkill(''); setMaxTime(0) }}
+                      className="btn-primary text-sm">
+                      Clear search
+                    </button>
+                  )}
+                </div>
+              )}
+            </section>
+          </>
+        )}
+      </div>
     </>
   )
 }

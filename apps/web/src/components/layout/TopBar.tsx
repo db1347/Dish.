@@ -7,7 +7,7 @@ export async function TopBar() {
   const { data: { user } } = await supabase.auth.getUser()
   return (
     <header className="sticky top-0 z-40 bg-cream/90 backdrop-blur-sm border-b border-black/[0.06]">
-      <div className="flex items-center justify-between px-4 py-3">
+      <div className="flex items-center justify-between px-4 py-3 max-w-7xl mx-auto w-full">
         <Link href="/" className="font-serif font-bold text-[22px] text-espresso leading-none">
           dish<span className="text-terracotta">.</span>
         </Link>

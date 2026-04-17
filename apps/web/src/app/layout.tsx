@@ -12,11 +12,8 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className={`${inter.className} text-espresso antialiased bg-[#EDE8E1]`}>
-        {/* Desktop: center app in a phone-width frame with shadow */}
-        <div className="min-h-dvh w-full max-w-[430px] mx-auto bg-cream shadow-[0_0_60px_rgba(0,0,0,0.12)] relative">
-          {children}
-        </div>
+      <body className={`${inter.className} bg-cream text-espresso antialiased`}>
+        {children}
       </body>
     </html>
   )

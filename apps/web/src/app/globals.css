@@ -17,15 +17,3 @@
   .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
 }
 
-/* Desktop: subtle food-pattern background behind the phone frame */
-@media (min-width: 431px) {
-  body {
-    background-image: radial-gradient(circle at 25% 25%, #D4956A22 0%, transparent 50%),
-                      radial-gradient(circle at 75% 75%, #7B9E8222 0%, transparent 50%);
-    background-attachment: fixed;
-  }
-  body > div {
-    border-left: 1px solid rgba(0,0,0,0.06);
-    border-right: 1px solid rgba(0,0,0,0.06);
-  }
-}

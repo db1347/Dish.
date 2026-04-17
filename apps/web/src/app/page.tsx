@@ -76,77 +76,79 @@ export default async function FeedPage() {
     <main className="min-h-dvh bg-cream flex flex-col">
       <TopBar />
       <div className="flex-1 overflow-y-auto pb-24">
-        <StoriesRow stories={stories as { id: string; username: string; avatar_url: string | null }[]} />
+        <div className="max-w-7xl mx-auto">
+          <StoriesRow stories={stories as { id: string; username: string; avatar_url: string | null }[]} />
 
-        {/* Feature strip */}
-        <div className="px-3 pt-1 pb-2">
-          <div className="flex gap-2">
-            {FEATURE_CARDS.map(f => (
-              <Link key={f.href} href={f.href}
-                className={`flex-1 rounded-2xl bg-gradient-to-br ${f.color} p-3 flex flex-col gap-1`}>
-                <span className="text-xl">{f.emoji}</span>
-                <span className="text-xs font-semibold text-espresso leading-tight">{f.label}</span>
-                <span className="text-[9px] text-clay leading-tight">{f.sub}</span>
-              </Link>
-            ))}
+          {/* Feature strip */}
+          <div className="px-4 pt-1 pb-2">
+            <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+              {FEATURE_CARDS.map(f => (
+                <Link key={f.href} href={f.href}
+                  className={`rounded-2xl bg-gradient-to-br ${f.color} p-3 flex flex-col gap-1`}>
+                  <span className="text-xl">{f.emoji}</span>
+                  <span className="text-xs font-semibold text-espresso leading-tight">{f.label}</span>
+                  <span className="text-[9px] text-clay leading-tight">{f.sub}</span>
+                </Link>
+              ))}
+            </div>
           </div>
-        </div>
 
-        {/* AI Suggestions */}
-        {aiRecipes && aiRecipes.length > 0 && (
-          <AISuggestionRow recipes={aiRecipes as Recipe[]} />
-        )}
+          {/* AI Suggestions */}
+          {aiRecipes && aiRecipes.length > 0 && (
+            <AISuggestionRow recipes={aiRecipes as Recipe[]} />
+          )}
 
-        {/* Personalized daily picks */}
-        {suggestedRecipes.length > 0 && (
-          <section className="px-3 mt-2">
-            <div className="flex items-center justify-between py-3">
-              <div>
-                <h2 className="text-[13px] font-semibold text-espresso">Today&apos;s picks for you</h2>
-                <p className="text-[10px] text-clay">Based on your cuisine preferences</p>
+          {/* Personalized daily picks */}
+          {suggestedRecipes.length > 0 && (
+            <section className="px-4 mt-2">
+              <div className="flex items-center justify-between py-3">
+                <div>
+                  <h2 className="text-[13px] font-semibold text-espresso">Today&apos;s picks for you</h2>
+                  <p className="text-[10px] text-clay">Based on your cuisine preferences</p>
+                </div>
+                <Link href="/explore" className="text-[11px] text-terracotta font-medium">See all</Link>
               </div>
-              <Link href="/explore" className="text-[11px] text-terracotta font-medium">See all</Link>
-            </div>
-            <div className="grid grid-cols-2 gap-2">
-              {suggestedRecipes.map((r: Recipe) => <RecipeCard key={r.id} recipe={r} />)}
-            </div>
-          </section>
-        )}
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
+                {suggestedRecipes.map((r: Recipe) => <RecipeCard key={r.id} recipe={r} />)}
+              </div>
+            </section>
+          )}
 
-        {/* Following feed */}
-        {showFollowingFeed && (
-          <section className="px-3 mt-4">
-            <div className="flex items-center justify-between py-3">
-              <h2 className="text-[13px] font-semibold text-espresso">Following</h2>
-              <Link href="/explore" className="text-[11px] text-terracotta font-medium">See all</Link>
-            </div>
-            <div className="grid grid-cols-2 gap-2">
-              {feedRecipes.map((r: Recipe) => <RecipeCard key={r.id} recipe={r} />)}
-            </div>
-          </section>
-        )}
+          {/* Following feed */}
+          {showFollowingFeed && (
+            <section className="px-4 mt-4">
+              <div className="flex items-center justify-between py-3">
+                <h2 className="text-[13px] font-semibold text-espresso">Following</h2>
+                <Link href="/explore" className="text-[11px] text-terracotta font-medium">See all</Link>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
+                {feedRecipes.map((r: Recipe) => <RecipeCard key={r.id} recipe={r} />)}
+              </div>
+            </section>
+          )}
 
-        {/* Trending */}
-        {trendingRecipes && trendingRecipes.length > 0 && (
-          <section className="px-3 mt-4">
-            <div className="flex items-center justify-between py-3">
-              <h2 className="text-[13px] font-semibold text-espresso">Trending today</h2>
-              <Link href="/explore" className="text-[11px] text-terracotta font-medium">See all</Link>
-            </div>
-            <div className="grid grid-cols-2 gap-2">
-              {(trendingRecipes as Recipe[]).map(r => <RecipeCard key={r.id} recipe={r} />)}
-            </div>
-          </section>
-        )}
+          {/* Trending */}
+          {trendingRecipes && trendingRecipes.length > 0 && (
+            <section className="px-4 mt-4">
+              <div className="flex items-center justify-between py-3">
+                <h2 className="text-[13px] font-semibold text-espresso">Trending today</h2>
+                <Link href="/explore" className="text-[11px] text-terracotta font-medium">See all</Link>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
+                {(trendingRecipes as Recipe[]).map(r => <RecipeCard key={r.id} recipe={r} />)}
+              </div>
+            </section>
+          )}
 
-        {!showFollowingFeed && (!trendingRecipes || trendingRecipes.length === 0) && (
-          <div className="flex flex-col items-center justify-center px-8 py-20 text-center">
-            <div className="text-5xl mb-4">🍳</div>
-            <h2 className="heading-serif text-xl mb-2">Your feed is empty</h2>
-            <p className="text-sm text-clay mb-6">Follow some chefs to see their recipes here.</p>
-            <Link href="/explore" className="btn-primary text-sm">Explore recipes</Link>
-          </div>
-        )}
+          {!showFollowingFeed && (!trendingRecipes || trendingRecipes.length === 0) && (
+            <div className="flex flex-col items-center justify-center px-8 py-20 text-center">
+              <div className="text-5xl mb-4">🍳</div>
+              <h2 className="heading-serif text-xl mb-2">Your feed is empty</h2>
+              <p className="text-sm text-clay mb-6">Follow some chefs to see their recipes here.</p>
+              <Link href="/explore" className="btn-primary text-sm">Explore recipes</Link>
+            </div>
+          )}
+        </div>
       </div>
       <BottomNav active="home" />
     </main>

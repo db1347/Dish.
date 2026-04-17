@@ -140,9 +140,9 @@ export function SavedClient({ initialCollections }: { initialCollections: Collec
           )}
 
           {/* Recipe grid */}
-          <div className="px-3">
+          <div className="px-4">
             {recipes.length > 0 ? (
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
                 {recipes.map(r => (
                   <div key={r.id} className="relative group">
                     <Link href={`/recipe/${r.id}`} className="card block overflow-hidden hover:border-black/15 transition-colors">
