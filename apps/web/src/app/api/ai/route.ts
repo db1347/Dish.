@@ -3,6 +3,8 @@ import { createClient } from '@/lib/supabase/server'
 
 const grok = new OpenAI({ apiKey: process.env.GROK_API_KEY!, baseURL: 'https://api.x.ai/v1' })
 const MODEL = 'grok-3-latest'
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY!
+const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`
 
 function stream(prompt: string, maxTokens = 1200) {
   return grok.chat.completions.create({
@@ -82,6 +84,69 @@ Ingredients: ${lines.join(' | ')}
 Reply with ONLY this JSON, no markdown:
 {"categories":[{"name":"Produce","items":[{"name":"","amount":"","checked":false}]}]}`
     return streamResponse(await stream(prompt, 800))
+  }
+
+  if (mode === 'scan') {
+    const { image_base64, mime_type } = body
+    if (!image_base64) return Response.json({ message: 'No image provided.' }, { status: 400 })
+
+    const prompt = `You are a recipe extraction expert. Look at this image of a recipe book page and extract all recipe information you can find.
+
+Reply with ONLY this JSON (no markdown, no extra text, no code blocks):
+{
+  "title": "",
+  "description": "",
+  "cuisine": "",
+  "dietary_tags": [],
+  "skill_level": "beginner",
+  "prep_time_mins": 0,
+  "cook_time_mins": 0,
+  "servings": 2,
+  "ingredients": [{"id": "1", "name": "", "quantity": 1, "unit": "g", "notes": ""}],
+  "steps": [{"order": 1, "instruction": "", "timer_mins": 0}]
+}
+
+Rules:
+- skill_level must be one of: beginner, intermediate, advanced
+- dietary_tags must only include values from: vegan, vegetarian, gluten-free, dairy-free, keto, paleo, halal, kosher
+- cuisine must be one of: Italian, Asian, Mexican, Mediterranean, Indian, French, American, Middle Eastern, Japanese, Thai, Other
+- unit must be one of: g, kg, ml, l, cup, tbsp, tsp, piece, slice, pinch, bunch
+- If a field is unclear or not present, use sensible defaults
+- Extract as much detail as possible from the image`
+
+    try {
+      const geminiRes = await fetch(GEMINI_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{
+            parts: [
+              { inline_data: { mime_type: mime_type || 'image/jpeg', data: image_base64 } },
+              { text: prompt },
+            ],
+          }],
+          generationConfig: { maxOutputTokens: 1500, temperature: 0.2 },
+        }),
+      })
+      const geminiJson = await geminiRes.json()
+      if (!geminiRes.ok) {
+        const errMsg = geminiJson?.error?.message ?? JSON.stringify(geminiJson)
+        throw new Error(errMsg)
+      }
+      const text = geminiJson.candidates?.[0]?.content?.parts?.[0]?.text ?? '{}'
+      const clean = text
+        .replace(/^```(?:json)?\s*/i, '')
+        .replace(/\s*```\s*$/i, '')
+        .trim()
+      const jsonMatch = clean.match(/\{[\s\S]*\}/)
+      if (!jsonMatch) throw new Error(`Model returned non-JSON: ${clean.slice(0, 200)}`)
+      const parsed = JSON.parse(jsonMatch[0])
+      return Response.json({ recipe: parsed })
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e)
+      console.error('[scan] error:', msg)
+      return Response.json({ message: `Scan failed: ${msg}` }, { status: 500 })
+    }
   }
 
   return Response.json({ message: 'Unknown AI mode.' }, { status: 400 })

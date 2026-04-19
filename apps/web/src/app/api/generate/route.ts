@@ -22,8 +22,11 @@ export async function POST(request: Request) {
     .single()
 
   if (profile && !profile.is_premium) {
+    // Reset at UTC midnight each day
+    const now = new Date()
+    const todayMidnightUTC = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()))
     const resetAt = new Date(profile.ai_generations_reset_at ?? 0)
-    const generationsToday = resetAt < new Date() ? 0 : (profile.ai_generations_today ?? 0)
+    const generationsToday = resetAt < todayMidnightUTC ? 0 : (profile.ai_generations_today ?? 0)
     if (generationsToday >= DAILY_FREE_LIMIT)
       return Response.json(
         { message: 'Daily limit reached. Upgrade to premium for unlimited generations.' },
@@ -46,10 +49,14 @@ Write a warm 2–3 sentence description, then output the recipe as:
 {"title":"","description":"","cuisine":"","dietary_tags":[],"skill_level":"beginner","prep_time_mins":0,"cook_time_mins":0,"servings":2,"estimated_calories":0,"ingredients":[{"id":"1","name":"","quantity":1,"unit":"","notes":""}],"steps":[{"order":1,"instruction":"","timer_mins":0}]}
 \`\`\``
 
-  // Increment usage counter (fire-and-forget)
+  // Increment usage counter (fire-and-forget). Reset_at marks the start of today UTC.
+  const now = new Date()
+  const todayMidnightUTC = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()))
+  const resetAt = new Date(profile?.ai_generations_reset_at ?? 0)
+  const currentCount = resetAt < todayMidnightUTC ? 0 : (profile?.ai_generations_today ?? 0)
   supabase.from('users').update({
-    ai_generations_today: (profile?.ai_generations_today ?? 0) + 1,
-    ai_generations_reset_at: new Date(Date.now() + 86400000).toISOString(),
+    ai_generations_today: currentCount + 1,
+    ai_generations_reset_at: todayMidnightUTC.toISOString(),
   }).eq('id', user.id).then(() => {})
 
   const stream = await grok.chat.completions.create({

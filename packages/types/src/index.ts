@@ -11,6 +11,9 @@ export interface User {
   following_count: number
   recipe_count: number
   avg_rating: number
+  is_premium?: boolean
+  ai_generations_today?: number
+  ai_generations_reset_at?: string | null
   created_at: string
 }
 
@@ -71,13 +74,19 @@ export interface Rating {
   created_at: string
 }
 
+export interface CollectionRecipe {
+  recipe_id: string
+  added_at: string
+  recipes: Recipe
+}
+
 export interface Collection {
   id: string
   user_id: string
   name: string
-  recipe_ids: string[]
   is_public: boolean
   created_at: string
+  collection_recipes: CollectionRecipe[]
 }
 
 export interface Follow {

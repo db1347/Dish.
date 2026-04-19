@@ -36,7 +36,7 @@ export default async function PublicProfilePage({ params }: { params: { username
     isFollowing = !!follow
   }
 
-  const totalMins = (recipes ?? []).length
+  const totalRecipes = (recipes ?? []).length
 
   return (
     <main className="min-h-dvh bg-cream flex flex-col">
@@ -81,7 +81,7 @@ export default async function PublicProfilePage({ params }: { params: { username
           {/* Stats */}
           <div className="grid grid-cols-4 gap-2">
             {[
-              { label: 'Recipes', value: profile.recipe_count ?? totalMins },
+              { label: 'Recipes', value: profile.recipe_count ?? totalRecipes },
               { label: 'Followers', value: profile.follower_count ?? 0 },
               { label: 'Following', value: profile.following_count ?? 0 },
               { label: 'Avg ★', value: (profile.avg_rating ?? 0).toFixed(1) },

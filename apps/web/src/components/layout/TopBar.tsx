@@ -5,6 +5,20 @@ import { SignOutButton } from './SignOutButton'
 export async function TopBar() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
+
+  // Check for unread notifications (fails silently if table doesn't exist yet)
+  let hasUnread = false
+  if (user) {
+    try {
+      const { count } = await supabase
+        .from('notifications')
+        .select('id', { count: 'exact', head: true })
+        .eq('user_id', user.id)
+        .eq('read', false)
+      hasUnread = (count ?? 0) > 0
+    } catch { /* table may not exist yet */ }
+  }
+
   return (
     <header className="sticky top-0 z-40 bg-cream/90 backdrop-blur-sm border-b border-black/[0.06]">
       <div className="flex items-center justify-between px-4 py-3 max-w-7xl mx-auto w-full">
@@ -25,7 +39,7 @@ export async function TopBar() {
                   <path d="M8 2C6 2 4.5 3.5 4.5 5.5c0 3.5-2 4.5-2 4.5h11s-2-1-2-4.5C11.5 3.5 10 2 8 2z" stroke="#2A1F1A" strokeWidth="1.2"/>
                   <path d="M6.5 13.5a1.5 1.5 0 003 0" stroke="#2A1F1A" strokeWidth="1.2" strokeLinecap="round"/>
                 </svg>
-                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-terracotta rounded-full"/>
+                {hasUnread && <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-terracotta rounded-full"/>}
               </Link>
               <SignOutButton />
             </>
