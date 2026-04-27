@@ -299,7 +299,7 @@ INSERT INTO public.recipes (
     {"order":1,"instruction":"Blend mango flesh until completely smooth. Add yoghurt, milk, sugar and crushed cardamom seeds. Blend again until frothy."},
     {"order":2,"instruction":"Taste and adjust sweetness. Add ice and blend once more until chilled and thick. Pour into tall glasses, optionally garnish with a pinch of cardamom or mango slices."}
   ]'::jsonb,
-  null,
+  'https://images.unsplash.com/photo-1553361371-9b22f78e8b1d?w=600&q=80&fit=crop',
   false, now() - interval '18 days'
 ),
 
@@ -351,7 +351,7 @@ INSERT INTO public.recipes (
     {"order":3,"instruction":"Ladle soup into oven-safe bowls. Place on a baking sheet. Float 2 croutons on each. Pile Gruyère over the top so it covers the bread and hangs over the edges."},
     {"order":4,"instruction":"Grill (broil) until cheese is bubbling, blistered and golden in spots — about 3–4 minutes. Serve immediately, warning guests that the bowls are very hot.","timer_mins":4}
   ]'::jsonb,
-  'https://images.unsplash.com/photo-1547592180-85f173990554?w=600&q=80&fit=crop',
+  'https://images.unsplash.com/photo-1603105037880-880cd4edfb0d?w=600&q=80&fit=crop',
   false, now() - interval '21 days'
 ),
 (
@@ -375,7 +375,7 @@ INSERT INTO public.recipes (
     {"order":3,"instruction":"Roll out pastry to just larger than the pan. Drape over apples, tucking the edges down around them. Pierce a few holes in the top."},
     {"order":4,"instruction":"Bake at 200°C (390°F) for 25–30 minutes until pastry is deeply golden and crisp. Rest for 5 minutes, then carefully invert onto a plate. Serve warm with cold crème fraîche.","timer_mins":30}
   ]'::jsonb,
-  null,
+  'https://images.unsplash.com/photo-1621303837174-89787a7d4729?w=600&q=80&fit=crop',
   false, now() - interval '12 days'
 ),
 
@@ -427,7 +427,7 @@ INSERT INTO public.recipes (
     {"order":2,"instruction":"Halve avocados and scoop flesh into a bowl. Mash with a fork — go for chunky, not smooth. You want texture."},
     {"order":3,"instruction":"Fold in onion, jalapeño paste and cilantro. Add lime juice and salt. Taste — adjust lime and salt until bright and balanced. Serve immediately with warm tortilla chips."}
   ]'::jsonb,
-  null,
+  'https://images.unsplash.com/photo-1600335895229-6e75511892c8?w=600&q=80&fit=crop',
   false, now() - interval '15 days'
 ),
 (
@@ -455,7 +455,7 @@ INSERT INTO public.recipes (
     {"order":3,"instruction":"Drain on paper towels for 30 seconds, then immediately roll in cinnamon sugar while still hot."},
     {"order":4,"instruction":"For the sauce: heat cream until steaming, pour over chopped chocolate and stir until silky. Serve churros immediately alongside the warm sauce."}
   ]'::jsonb,
-  null,
+  'https://images.unsplash.com/photo-1624996379697-f01d168b1a52?w=600&q=80&fit=crop',
   false, now() - interval '8 days'
 ),
 
@@ -511,7 +511,7 @@ INSERT INTO public.recipes (
     {"order":3,"instruction":"Wet hands, salt them lightly. Take a handful of rice, flatten in your palm, add a spoonful of salmon in the centre, close the rice around it and shape into a triangle, pressing firmly."},
     {"order":4,"instruction":"Wrap base in a half-sheet of nori. Eat immediately for maximum crunch, or wrap tightly in clingfilm to pack for lunch."}
   ]'::jsonb,
-  null,
+  'https://images.unsplash.com/photo-1617196034183-421b4040d20d?w=600&q=80&fit=crop',
   false, now() - interval '6 days'
 ),
 (
@@ -538,7 +538,7 @@ INSERT INTO public.recipes (
     {"order":3,"instruction":"Roll dough thin, cut into 8cm circles. Place a teaspoon of filling in the centre. Fold and pleat one side to seal into a crescent. Make 24 gyoza."},
     {"order":4,"instruction":"Heat oil in a non-stick pan over medium-high. Add gyoza flat-side down. Fry 2 minutes until golden. Add 60ml water, cover immediately, steam for 3 minutes. Uncover and fry 1 more minute until bases are crispy again.","timer_mins":6}
   ]'::jsonb,
-  null,
+  'https://images.unsplash.com/photo-1563245372-f21724e3856d?w=600&q=80&fit=crop',
   false, now() - interval '4 days'
 ),
 
@@ -594,7 +594,7 @@ INSERT INTO public.recipes (
     {"order":3,"instruction":"In the empty pasta pot, warm the cashew cream over low heat. Add pasta and toss to coat, adding pasta water as needed. Add spinach and fold through until wilted."},
     {"order":4,"instruction":"Top with cherry tomatoes, a drizzle of olive oil and freshly cracked black pepper. Serve immediately."}
   ]'::jsonb,
-  null,
+  'https://images.unsplash.com/photo-1473093295043-cdd812d0e601?w=600&q=80&fit=crop',
   false, now() - interval '3 days'
 ),
 (
@@ -618,7 +618,7 @@ INSERT INTO public.recipes (
     {"order":2,"instruction":"Taste and adjust: more cocoa for intensity, more maple for sweetness. Chill for 30 minutes if you can wait — it sets firmer and the flavour deepens."},
     {"order":3,"instruction":"Serve in small glasses or bowls, topped with fresh raspberries and a dusting of cocoa. This will keep in the fridge for up to 2 days."}
   ]'::jsonb,
-  null,
+  'https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?w=600&q=80&fit=crop',
   false, now() - interval '1 day'
 );
 

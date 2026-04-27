@@ -7,14 +7,15 @@ import { FollowButton } from '@/components/profile/FollowButton'
 import { RecipeCard } from '@/components/feed/RecipeCard'
 import type { Recipe } from '@dish/types'
 
-export default async function PublicProfilePage({ params }: { params: { username: string } }) {
+export default async function PublicProfilePage({ params }: { params: Promise<{ username: string }> }) {
+  const { username } = await params
   const supabase = await createClient()
   const { data: { user: currentUser } } = await supabase.auth.getUser()
 
   const { data: profile } = await supabase
     .from('users')
     .select('*')
-    .eq('username', params.username)
+    .eq('username', username)
     .single()
 
   if (!profile) notFound()

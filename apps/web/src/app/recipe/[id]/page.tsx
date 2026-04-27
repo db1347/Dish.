@@ -4,14 +4,15 @@ import Link from 'next/link'
 import { BottomNav } from '@/components/layout/BottomNav'
 import { RecipeDetailClient } from '@/components/recipe/RecipeDetailClient'
 
-export default async function RecipeDetailPage({ params }: { params: { id: string } }) {
+export default async function RecipeDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
   const { data: recipe } = await supabase
     .from('recipes')
     .select('*, author:users(id, username, display_name, avatar_url, bio, follower_count, following_count, recipe_count, avg_rating, dietary_prefs, cuisine_prefs, skill_level, is_premium, ai_generations_today, ai_generations_reset_at, created_at)')
-    .eq('id', params.id)
+    .eq('id', id)
     .single()
 
   if (!recipe) notFound()
@@ -20,7 +21,7 @@ export default async function RecipeDetailPage({ params }: { params: { id: strin
   const { data: comments } = await supabase
     .from('comments')
     .select('*, author:users(id, username, display_name, avatar_url)')
-    .eq('recipe_id', params.id)
+    .eq('recipe_id', id)
     .order('created_at', { ascending: true })
 
   // Check if user has rated
@@ -30,9 +31,9 @@ export default async function RecipeDetailPage({ params }: { params: { id: strin
 
   if (user) {
     const [{ data: rating }, { data: follow }, { data: collections }] = await Promise.all([
-      supabase.from('ratings').select('stars').eq('recipe_id', params.id).eq('user_id', user.id).single(),
+      supabase.from('ratings').select('stars').eq('recipe_id', id).eq('user_id', user.id).single(),
       supabase.from('follows').select('follower_id').eq('follower_id', user.id).eq('following_id', recipe.author_id).single(),
-      supabase.from('collections').select('id, collection_recipes!inner(recipe_id)').eq('user_id', user.id).eq('collection_recipes.recipe_id', params.id),
+      supabase.from('collections').select('id, collection_recipes!inner(recipe_id)').eq('user_id', user.id).eq('collection_recipes.recipe_id', id),
     ])
     userRating = rating?.stars ?? 0
     isFollowing = !!follow
